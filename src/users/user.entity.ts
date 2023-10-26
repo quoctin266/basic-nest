@@ -1,5 +1,11 @@
 import { Photo } from '../photos/photo.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  DeleteDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -15,8 +21,12 @@ export class User {
   @Column({ default: false })
   isActive: boolean;
 
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
   @OneToMany(() => Photo, (photo) => photo.user, {
     cascade: ['insert', 'update'],
+    eager: true,
   })
   photos: Photo[];
 }
