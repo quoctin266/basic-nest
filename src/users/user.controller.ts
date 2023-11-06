@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
-import { updateRequestDTO } from './updateRequestDTO';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -21,16 +21,14 @@ export class UserController {
   }
 
   @Post()
-  async postCreateUser(@Body() data: Body) {
-    return await this.userService.createUser(data);
+  async postCreateUser(@Body() createUserDTO: CreateUserDto) {
+    return await this.userService.createUser(createUserDTO);
   }
 
   @Put(':userId')
-  async postUpdateUser(
-    @Body() data: updateRequestDTO,
-    @Param('userId', ParseIntPipe) userId: number,
-  ) {
-    return await this.userService.update(userId, data);
+  async postUpdateUser() {
+    // @Param('userId', ParseIntPipe) userId: number, // @Body() data: updateRequestDTO,
+    return await this.userService.update();
   }
 
   @Delete(':userId')

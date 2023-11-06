@@ -13,13 +13,25 @@ export class User {
   id: number;
 
   @Column()
-  firstName: string;
+  username: string;
+
+  @Column({ nullable: false })
+  email: string;
+
+  @Column({ nullable: false })
+  password: string;
 
   @Column()
-  lastName: string;
+  phone: string;
 
-  @Column({ default: false })
-  isActive: boolean;
+  @Column()
+  age: number;
+
+  @Column()
+  createdAt: Date;
+
+  @Column()
+  updatedAt: Date;
 
   @DeleteDateColumn()
   deletedAt?: Date;

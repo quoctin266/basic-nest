@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { User } from './user.entity';
 import { Photo } from 'src/photos/photo.entity';
-import { updateRequestDTO } from './updateRequestDTO';
+import { CreateUserDto } from './dto/create-user.dto';
+import { genSalt, hash } from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -15,30 +16,33 @@ export class UsersService {
     private dataSource: DataSource,
   ) {}
 
+  async hashPassword(password: string) {
+    const salt = await genSalt(10);
+    const hashPW = await hash(password, salt);
+    return hashPW;
+  }
+
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  async createUser(user) {
-    if (user.isActive !== '0' && user.isActive !== 'false')
-      user.isActive = true;
-    else user.isActive = false;
+  async createUser(createUserDTO: CreateUserDto) {
+    // const newUser = this.usersRepository.create({
+    //   firstName: user.firstName,
+    //   lastName: user.lastName,
+    //   isActive: user.isActive,
+    //   photos: [
+    //     {
+    //       url: user.photo,
+    //     },
+    //   ],
+    // });
 
-    const newUser = this.usersRepository.create({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      isActive: user.isActive,
-      photos: [
-        {
-          url: user.photo,
-        },
-      ],
-    });
+    // await this.usersRepository.save(newUser);
 
-    await this.usersRepository.save(newUser);
-
-    console.log(newUser);
-    return 'ok';
+    // console.log(newUser);
+    createUserDTO.password = await this.hashPassword(createUserDTO.password);
+    return await this.usersRepository.insert(createUserDTO);
   }
 
   findOne(id: number): Promise<User | null> {
@@ -49,7 +53,7 @@ export class UsersService {
     return await this.usersRepository.softDelete(id);
   }
 
-  async update(id: number, updateReq: updateRequestDTO) {
-    return await this.usersRepository.update(id, updateReq);
+  async update() {
+    return 'ok';
   }
 }
