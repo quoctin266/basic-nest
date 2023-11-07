@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import { Photo } from 'src/photos/photo.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { genSalt, hash } from 'bcryptjs';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -53,7 +54,9 @@ export class UsersService {
     return await this.usersRepository.softDelete(id);
   }
 
-  async update() {
-    return 'ok';
+  async update(updateUserDTO: UpdateUserDTO) {
+    return await this.usersRepository.update(updateUserDTO.id, {
+      ...updateUserDTO,
+    });
   }
 }

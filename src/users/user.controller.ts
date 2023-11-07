@@ -7,9 +7,11 @@ import {
   Delete,
   Param,
   ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -20,15 +22,26 @@ export class UserController {
     return await this.userService.findAll();
   }
 
+  @Get(':id')
+  async getUserDetail(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.userService.findOne(id);
+    if (user)
+      return {
+        error: 0,
+        message: null,
+        data: user,
+      };
+    else return new NotFoundException();
+  }
+
   @Post()
   async postCreateUser(@Body() createUserDTO: CreateUserDto) {
     return await this.userService.createUser(createUserDTO);
   }
 
-  @Put(':userId')
-  async postUpdateUser() {
-    // @Param('userId', ParseIntPipe) userId: number, // @Body() data: updateRequestDTO,
-    return await this.userService.update();
+  @Put()
+  async postUpdateUser(@Body() data: UpdateUserDTO) {
+    return await this.userService.update(data);
   }
 
   @Delete(':userId')
