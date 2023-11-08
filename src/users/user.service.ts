@@ -4,7 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { User } from './user.entity';
 import { Photo } from 'src/photos/photo.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { genSalt, hash } from 'bcryptjs';
+import { genSalt, hash, compare } from 'bcryptjs';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
@@ -21,6 +21,10 @@ export class UsersService {
     const salt = await genSalt(10);
     const hashPW = await hash(password, salt);
     return hashPW;
+  }
+
+  async checkPassword(hash: string, password: string) {
+    return await compare(password, hash);
   }
 
   findAll(): Promise<User[]> {
@@ -48,6 +52,10 @@ export class UsersService {
 
   findOne(id: number): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
+  }
+
+  findOneByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ email });
   }
 
   async remove(id: number) {
