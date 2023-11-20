@@ -5,6 +5,8 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   DeleteDateColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -15,10 +17,10 @@ export class User {
   @Column()
   username: string;
 
-  @Column({ nullable: false })
+  @Column()
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
   password: string;
 
   @Column()
@@ -27,10 +29,10 @@ export class User {
   @Column()
   age: number;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @DeleteDateColumn()
@@ -41,4 +43,7 @@ export class User {
     eager: true,
   })
   photos: Photo[];
+
+  // @OneToMany(() => Company, (company) => company.createdBy)
+  // companies: Company[];
 }
