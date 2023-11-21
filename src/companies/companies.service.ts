@@ -24,7 +24,18 @@ export class CompaniesService {
   }
 
   findAll() {
-    return this.companiesRepository.find();
+    return this.companiesRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.createdBy', 'user')
+      .select([
+        'user.email',
+        'user.id',
+        'user.username',
+        'user.phone',
+        'user.age',
+        'company',
+      ])
+      .getMany();
   }
 
   findOne(id: number) {
