@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 // import { JwtAuthGuard } from './auth/jwt-auth.guard';
 // import { APP_GUARD } from '@nestjs/core';
+import { CompaniesModule } from './companies/companies.module';
+import { Company } from './companies/entities/company.entity';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
         port: +configService.get('DB_PORT'),
         username: configService.get('DB_USER'),
         database: configService.get('DB_NAME'),
+        entities: [Company],
         autoLoadEntities: true,
         synchronize: true,
       }),
@@ -28,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [
