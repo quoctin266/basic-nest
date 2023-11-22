@@ -6,6 +6,7 @@ import { Company } from './entities/company.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUser } from 'src/users/users.interface';
 import { UsersService } from 'src/users/user.service';
+import { CompanyFilterDto } from './dto/company-filter.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -23,9 +24,17 @@ export class CompaniesService {
     });
   }
 
-  findAll() {
-    return this.companiesRepository
-      .createQueryBuilder('company')
+  findAll(page: number, limit: number, filter: CompanyFilterDto) {
+    const offset = (page - 1) * limit;
+
+    const query = this.companiesRepository.createQueryBuilder('company');
+
+    if (filter.name)
+      query.andWhere('company.name = :name', { name: filter.name });
+    if (filter.address)
+      query.andWhere('company.address = :address', { address: filter.address });
+
+    return query
       .leftJoinAndSelect('company.createdBy', 'user')
       .select([
         'user.email',
@@ -35,6 +44,8 @@ export class CompaniesService {
         'user.age',
         'company',
       ])
+      .offset(offset)
+      .limit(limit)
       .getMany();
   }
 
