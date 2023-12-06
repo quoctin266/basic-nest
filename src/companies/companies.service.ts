@@ -24,29 +24,43 @@ export class CompaniesService {
     });
   }
 
-  findAll(page: number, limit: number, filter: CompanyFilterDto) {
-    const offset = (page - 1) * limit;
+  async findAll(page: number, limit: number, filter: CompanyFilterDto) {
+    const defaultLimit = limit ? limit : 10;
+    const offset = (page - 1) * defaultLimit;
 
     const query = this.companiesRepository.createQueryBuilder('company');
 
     if (filter.name)
-      query.andWhere('company.name = :name', { name: filter.name });
+      query.andWhere('company.name like :name', { name: `%${filter.name}%` });
     if (filter.address)
       query.andWhere('company.address = :address', { address: filter.address });
 
-    return query
+    const totalItems = (await query.getMany()).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
+
+    const res = await query
       .leftJoinAndSelect('company.createdBy', 'user')
-      .select([
-        'user.email',
-        'user.id',
-        'user.username',
-        'user.phone',
-        'user.age',
-        'company',
-      ])
+      // .select([
+      //   'user.email',
+      //   'user.id',
+      //   'user.username',
+      //   'user.phone',
+      //   'user.age',
+      //   'company',
+      // ])
       .offset(offset)
-      .limit(limit)
+      .limit(defaultLimit)
       .getMany();
+
+    return {
+      meta: {
+        current: page,
+        pageSize: defaultLimit,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: res,
+    };
   }
 
   findOne(id: number) {

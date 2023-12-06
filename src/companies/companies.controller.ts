@@ -26,8 +26,12 @@ export class CompaniesController {
 
   @Get()
   findAll(@Query() query) {
-    const { page, limit, ...filter } = query;
-    return this.companiesService.findAll(+page, +limit, filter);
+    const { page, limit, ...filter } = <{ page: number; limit: number }>query;
+    return this.companiesService.findAll(
+      +page,
+      +limit,
+      filter as CompanyFilterDto,
+    );
   }
 
   @Get(':id')
