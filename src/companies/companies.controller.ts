@@ -7,11 +7,12 @@ import {
   Param,
   Delete,
   Query,
+  Version,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { CompanyFilterDto } from './dto/company-filter.dto';
 
@@ -24,7 +25,10 @@ export class CompaniesController {
     return this.companiesService.create(createCompanyDto, user);
   }
 
+  @Version('1')
   @Get()
+  // set response message as meta data
+  @ResponseMessage('Fetching company list success')
   findAll(@Query() query) {
     const { page, limit, ...filter } = <{ page: number; limit: number }>query;
     return this.companiesService.findAll(
@@ -33,6 +37,12 @@ export class CompaniesController {
       filter as CompanyFilterDto,
     );
   }
+
+  // @Version('2')
+  // @Get()
+  // findAllV2(@Query() query) {
+  //   return 'fetch version 2';
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
