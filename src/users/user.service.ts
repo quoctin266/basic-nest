@@ -1,19 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { Photo } from 'src/photos/photo.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { genSalt, hash, compare } from 'bcryptjs';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
+import { Role } from 'src/role/entities/role.entity';
+import { IUser } from './users.interface';
+import { RolesService } from 'src/role/role.service';
+import { CompaniesService } from 'src/companies/companies.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    @InjectRepository(Photo)
-    private photoRepository: Repository<Photo>,
+    private usersRepository: Repository<User>, // private dataSource: DataSource,
+    private rolesService: RolesService,
+    @Inject(forwardRef(() => CompaniesService))
+    private companiessService: CompaniesService,
     private dataSource: DataSource,
   ) {}
 
@@ -27,27 +37,57 @@ export class UsersService {
     return await compare(password, hash);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  findAll(page: number, limit: number) {
+    const defaultLimit = limit ? limit : 10;
+    const offset = (page - 1) * defaultLimit;
+
+    return this.usersRepository.find({
+      skip: offset,
+      take: defaultLimit,
+    });
   }
 
-  async createUser(createUserDTO: CreateUserDto) {
-    // const newUser = this.usersRepository.create({
-    //   firstName: user.firstName,
-    //   lastName: user.lastName,
-    //   isActive: user.isActive,
-    //   photos: [
-    //     {
-    //       url: user.photo,
-    //     },
-    //   ],
-    // });
+  async registerUser(registerUserDTO: RegisterUserDto) {
+    const user = await this.usersRepository.findOneBy({
+      email: registerUserDTO.email,
+    });
+    if (user) throw new ConflictException('Email already existed');
 
-    // await this.usersRepository.save(newUser);
+    registerUserDTO.password = await this.hashPassword(
+      registerUserDTO.password,
+    );
 
-    // console.log(newUser);
+    const role = await this.dataSource
+      .getRepository(Role)
+      .createQueryBuilder('role')
+      .where('role.name = :name', { name: 'USER' })
+      .getOne();
+
+    return await this.usersRepository.insert({
+      ...registerUserDTO,
+      role,
+    });
+  }
+
+  async createUser(createUserDTO: CreateUserDto, creatorInfo: IUser) {
+    const user = await this.usersRepository.findOneBy({
+      email: createUserDTO.email,
+    });
+    if (user) throw new ConflictException('Email already existed');
+
     createUserDTO.password = await this.hashPassword(createUserDTO.password);
-    return await this.usersRepository.insert(createUserDTO);
+    const creator = await this.findOne(creatorInfo.id);
+    const role = await this.rolesService.findById(createUserDTO.roleId);
+    const company = await this.companiessService.findOne(
+      createUserDTO.companyId,
+    );
+
+    return this.usersRepository.insert({
+      ...createUserDTO,
+      createdBy: creator,
+      role,
+      company,
+    });
   }
 
   findOne(id: number): Promise<User | null> {
@@ -55,16 +95,36 @@ export class UsersService {
   }
 
   findOneByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ email });
+    return this.dataSource
+      .getRepository(User)
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .where('user.email = :email', { email })
+      .getOne();
   }
 
-  async remove(id: number) {
-    return await this.usersRepository.softDelete(id);
+  async remove(id: number, deleterInfo: IUser) {
+    const deleter = await this.findOne(deleterInfo.id);
+    await this.usersRepository.update(id, {
+      deletedBy: deleter,
+    });
+
+    return this.usersRepository.softDelete(id);
   }
 
-  async update(updateUserDTO: UpdateUserDTO) {
-    return await this.usersRepository.update(updateUserDTO.id, {
-      ...updateUserDTO,
+  async update(updateUserDTO: UpdateUserDTO, updaterInfo: IUser) {
+    const updater = await this.findOne(updaterInfo.id);
+    const role = await this.rolesService.findById(updateUserDTO.roleId);
+    const company = await this.companiessService.findOne(
+      updateUserDTO.companyId,
+    );
+
+    const { roleId, companyId, ...updateInfo } = updateUserDTO;
+    return this.usersRepository.update(updateUserDTO.id, {
+      ...updateInfo,
+      updatedBy: updater,
+      role,
+      company,
     });
   }
 }

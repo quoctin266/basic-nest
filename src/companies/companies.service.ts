@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Repository } from 'typeorm';
@@ -13,6 +13,7 @@ export class CompaniesService {
   constructor(
     @InjectRepository(Company)
     private companiesRepository: Repository<Company>,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 
@@ -63,8 +64,8 @@ export class CompaniesService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  findOne(id: string) {
+    return this.companiesRepository.findOneBy({ id });
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {

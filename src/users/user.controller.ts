@@ -8,44 +8,53 @@ import {
   Param,
   ParseIntPipe,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { ResponseMessage, UserDec } from 'src/decorator/customize';
+import { IUser } from './users.interface';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
-  async getAllUsers() {
-    return await this.userService.findAll();
+  getAllUsers(@Query() query) {
+    const { page, limit } = <{ page: number; limit: number }>query;
+
+    return this.userService.findAll(+page, +limit);
   }
 
   @Get(':id')
   async getUserDetail(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.findOne(id);
-    if (user)
-      return {
-        error: 0,
-        message: null,
-        data: user,
-      };
-    else return new NotFoundException();
+    if (user) return user;
+    else throw new NotFoundException();
   }
 
   @Post()
-  async postCreateUser(@Body() createUserDTO: CreateUserDto) {
-    return await this.userService.createUser(createUserDTO);
+  @ResponseMessage('Create user successfully')
+  async postCreateUser(
+    @Body() createUserDTO: CreateUserDto,
+    @UserDec() user: IUser,
+  ) {
+    return this.userService.createUser(createUserDTO, user);
   }
 
   @Put()
-  async postUpdateUser(@Body() data: UpdateUserDTO) {
-    return await this.userService.update(data);
+  @ResponseMessage('Update user successfully')
+  async postUpdateUser(@Body() data: UpdateUserDTO, @UserDec() user: IUser) {
+    return await this.userService.update(data, user);
   }
 
   @Delete(':userId')
-  async deleteUser(@Param('userId', ParseIntPipe) userId: number) {
-    return await this.userService.remove(userId);
+  @ResponseMessage('Delete user successfully')
+  async deleteUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @UserDec() user: IUser,
+  ) {
+    return await this.userService.remove(userId, user);
   }
 }

@@ -1,4 +1,4 @@
-import { Company } from 'src/companies/entities/company.entity';
+import { User } from 'src/users/user.entity';
 import {
   Entity,
   Column,
@@ -9,30 +9,20 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Role } from 'src/role/entities/role.entity';
 
 @Entity()
-export class User {
+export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  username: string;
+  name: string;
 
   @Column()
-  email: string;
-
-  @Column({ select: false })
-  password: string;
+  description: string;
 
   @Column()
-  phone: string;
-
-  @Column()
-  age: number;
-
-  @Column()
-  refreshToken: string;
+  isActive: boolean;
 
   @CreateDateColumn({ select: false })
   createdAt: Date;
@@ -63,13 +53,4 @@ export class User {
     referencedColumnName: 'id',
   })
   deletedBy: User;
-
-  @ManyToOne(() => Company)
-  company: Company;
-
-  @ManyToOne(() => Role, { eager: true })
-  role: Role;
-
-  // @OneToMany(() => Company, (company) => company.createdBy)
-  // companies: Company[];
 }
