@@ -15,12 +15,15 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { ResponseMessage, UserDec } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { CompanyFilterDto } from './dto/company-filter.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('companies')
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
   @Post()
+  @ResponseMessage('Create company successfully')
   create(@Body() createCompanyDto: CreateCompanyDto, @UserDec() user: IUser) {
     return this.companiesService.create(createCompanyDto, user);
   }
@@ -50,6 +53,7 @@ export class CompaniesController {
   }
 
   @Patch(':id')
+  @ResponseMessage('Update company successfully')
   update(
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDto,
@@ -59,6 +63,7 @@ export class CompaniesController {
   }
 
   @Delete(':id')
+  @ResponseMessage('Delete company successfully')
   remove(@Param('id') id: string, @UserDec() user: IUser) {
     return this.companiesService.remove(id, user);
   }

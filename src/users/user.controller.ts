@@ -15,12 +15,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { ResponseMessage, UserDec } from 'src/decorator/customize';
 import { IUser } from './users.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
+  @ResponseMessage('Fetch list user successfully')
   getAllUsers(@Query() query) {
     const { page, limit } = <{ page: number; limit: number }>query;
 

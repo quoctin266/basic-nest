@@ -42,7 +42,7 @@ export class UsersService {
     const offset = (page - 1) * defaultLimit;
 
     return this.usersRepository.find({
-      skip: offset,
+      skip: offset ? offset : 0,
       take: defaultLimit,
     });
   }
@@ -63,10 +63,12 @@ export class UsersService {
       .where('role.name = :name', { name: 'USER' })
       .getOne();
 
-    return await this.usersRepository.insert({
+    const result = await this.usersRepository.insert({
       ...registerUserDTO,
       role,
     });
+
+    return result.generatedMaps[0];
   }
 
   async createUser(createUserDTO: CreateUserDto, creatorInfo: IUser) {
@@ -82,12 +84,14 @@ export class UsersService {
       createUserDTO.companyId,
     );
 
-    return this.usersRepository.insert({
+    const result = await this.usersRepository.insert({
       ...createUserDTO,
       createdBy: creator,
       role,
       company,
     });
+
+    return result.generatedMaps[0];
   }
 
   findOne(id: number): Promise<User | null> {
@@ -100,6 +104,7 @@ export class UsersService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .where('user.email = :email', { email })
+      .addSelect('user.password')
       .getOne();
   }
 

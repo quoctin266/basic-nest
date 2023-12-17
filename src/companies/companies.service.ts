@@ -19,10 +19,13 @@ export class CompaniesService {
 
   async create(createCompanyDto: CreateCompanyDto, user: IUser) {
     const creator = await this.usersService.findOne(user.id);
-    return this.companiesRepository.insert({
+
+    const result = await this.companiesRepository.insert({
       ...createCompanyDto,
       createdBy: creator,
     });
+
+    return result.generatedMaps[0];
   }
 
   async findAll(page: number, limit: number, filter: CompanyFilterDto) {
@@ -49,13 +52,13 @@ export class CompaniesService {
       //   'user.age',
       //   'company',
       // ])
-      .offset(offset)
+      .offset(offset ? offset : 0)
       .limit(defaultLimit)
       .getMany();
 
     return {
       meta: {
-        current: page,
+        current: page ? page : 1,
         pageSize: defaultLimit,
         pages: totalPages,
         total: totalItems,

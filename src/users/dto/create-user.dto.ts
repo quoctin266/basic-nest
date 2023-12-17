@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { Allow, IsEmail, IsNotEmpty } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -15,6 +16,9 @@ export class CreateUserDto {
   phone: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => {
+    return Number(value);
+  }) // convert falsy value to 0
   age: number;
 
   @IsNotEmpty()
