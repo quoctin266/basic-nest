@@ -35,10 +35,15 @@ async function bootstrap() {
     .setTitle('Nest Basic API')
     .setDescription('API For Nest Basic')
     .setVersion('1.0')
-    .addTag('users')
+    .addBearerAuth()
+    .addSecurityRequirements('bearer')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   await app.listen(configService.get<string>('PORT'));
 }

@@ -28,16 +28,18 @@ export class CompaniesService {
     return result.generatedMaps[0];
   }
 
-  async findAll(page: number, limit: number, filter: CompanyFilterDto) {
-    const defaultLimit = limit ? limit : 10;
-    const offset = (page - 1) * defaultLimit;
+  async findAll(queryObj: CompanyFilterDto) {
+    const defaultLimit = queryObj.limit ? queryObj.limit : 10;
+    const offset = (queryObj.page - 1) * defaultLimit;
 
     const query = this.companiesRepository.createQueryBuilder('company');
 
-    if (filter.name)
-      query.andWhere('company.name like :name', { name: `%${filter.name}%` });
-    if (filter.address)
-      query.andWhere('company.address = :address', { address: filter.address });
+    if (queryObj.name)
+      query.andWhere('company.name like :name', { name: `%${queryObj.name}%` });
+    if (queryObj.address)
+      query.andWhere('company.address = :address', {
+        address: queryObj.address,
+      });
 
     const totalItems = (await query.getMany()).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
@@ -58,7 +60,7 @@ export class CompaniesService {
 
     return {
       meta: {
-        current: page ? page : 1,
+        current: queryObj.page ? queryObj.page : 1,
         pageSize: defaultLimit,
         pages: totalPages,
         total: totalItems,
