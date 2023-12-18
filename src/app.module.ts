@@ -13,10 +13,10 @@ import { typeOrmAsyncConfig } from './config.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     UsersModule,
     AuthModule,
     CompaniesModule,

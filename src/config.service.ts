@@ -1,19 +1,10 @@
+import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 import { DataSource } from 'typeorm';
 
-const dbConfig = {
-  type: 'mysql' as const,
-  host: 'localhost',
-  port: 3306,
-  username: 'root',
-  database: 'nest_basic',
-  autoLoadEntities: true,
-  synchronize: true,
-  migrationsRun: true,
-  migrations: ['src/migration/*.ts'],
-};
+config();
 
 export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   useFactory: (configService: ConfigService) => ({
@@ -28,6 +19,18 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
     migrations: [join(__dirname, 'migration', '*.{ts,js}')],
   }),
   inject: [ConfigService],
+};
+
+const dbConfig = {
+  type: 'mysql' as const,
+  host: process.env.DB_HOST,
+  port: +process.env.DB_POST,
+  username: process.env.DB_USER,
+  database: process.env.DB_NAME,
+  autoLoadEntities: true,
+  synchronize: true,
+  migrationsRun: true,
+  migrations: ['src/migration/*.ts'],
 };
 
 export default new DataSource(dbConfig);
