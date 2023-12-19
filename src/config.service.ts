@@ -2,7 +2,11 @@ import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { join } from 'path';
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { SeederOptions } from 'typeorm-extension';
+import { Company } from 'src/companies/entities/company.entity';
+import { User } from './users/user.entity';
+import { Role } from './role/entities/role.entity';
 
 config();
 
@@ -21,16 +25,18 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   inject: [ConfigService],
 };
 
-const dbConfig = {
+const dbConfig: DataSourceOptions & SeederOptions = {
   type: 'mysql' as const,
   host: process.env.DB_HOST,
   port: +process.env.DB_POST,
   username: process.env.DB_USER,
   database: process.env.DB_NAME,
-  autoLoadEntities: true,
+  entities: [Company, User, Role],
   synchronize: true,
   migrationsRun: true,
   migrations: ['src/migration/*.ts'],
+  factories: ['src/factories/*.ts'],
+  seeds: ['src/seeder/*.ts'],
 };
 
 export default new DataSource(dbConfig);
