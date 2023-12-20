@@ -12,7 +12,7 @@ import { genSalt, hash, compare } from 'bcryptjs';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import { Role } from 'src/role/entities/role.entity';
-import { IUser } from './users.interface';
+import { UserDTO } from './users.dto';
 import { RolesService } from 'src/role/role.service';
 import { CompaniesService } from 'src/companies/companies.service';
 
@@ -37,14 +37,37 @@ export class UsersService {
     return await compare(password, hash);
   }
 
-  findAll(page: number, limit: number) {
+  async findAll(page: number, limit: number) {
     const defaultLimit = limit ? limit : 10;
     const offset = (page - 1) * defaultLimit;
 
-    return this.usersRepository.find({
-      skip: offset ? offset : 0,
-      take: defaultLimit,
-    });
+    const query = this.usersRepository.createQueryBuilder('user');
+
+    const totalItems = (await query.getMany()).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
+
+    const res = await query
+      .leftJoinAndSelect('user.company', 'company')
+      .leftJoin('user.role', 'role')
+      .addSelect(['role.name'])
+      .offset(offset ? offset : 0)
+      .limit(defaultLimit)
+      .getMany();
+
+    return {
+      meta: {
+        current: page ? page : 1,
+        pageSize: defaultLimit,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: res,
+    };
+
+    // return this.usersRepository.find({
+    //   skip: offset ? offset : 0,
+    //   take: defaultLimit,
+    // });
   }
 
   async registerUser(registerUserDTO: RegisterUserDto) {
@@ -71,7 +94,7 @@ export class UsersService {
     return result.generatedMaps[0];
   }
 
-  async createUser(createUserDTO: CreateUserDto, creatorInfo: IUser) {
+  async createUser(createUserDTO: CreateUserDto, creatorInfo: UserDTO) {
     const user = await this.usersRepository.findOneBy({
       email: createUserDTO.email,
     });
@@ -98,6 +121,10 @@ export class UsersService {
     return this.usersRepository.findOneBy({ id });
   }
 
+  findOneByToken(refreshToken: string) {
+    return this.usersRepository.findOneBy({ refreshToken });
+  }
+
   findOneByEmail(email: string): Promise<User | null> {
     return this.dataSource
       .getRepository(User)
@@ -108,7 +135,7 @@ export class UsersService {
       .getOne();
   }
 
-  async remove(id: number, deleterInfo: IUser) {
+  async remove(id: number, deleterInfo: UserDTO) {
     const deleter = await this.findOne(deleterInfo.id);
     await this.usersRepository.update(id, {
       deletedBy: deleter,
@@ -117,7 +144,7 @@ export class UsersService {
     return this.usersRepository.softDelete(id);
   }
 
-  async update(updateUserDTO: UpdateUserDTO, updaterInfo: IUser) {
+  async update(updateUserDTO: UpdateUserDTO, updaterInfo: UserDTO) {
     const updater = await this.findOne(updaterInfo.id);
     const role = await this.rolesService.findById(updateUserDTO.roleId);
     const company = await this.companiessService.findOne(
@@ -130,6 +157,12 @@ export class UsersService {
       updatedBy: updater,
       role,
       company,
+    });
+  }
+
+  async updateUserToken(refreshToken: string, id: number) {
+    return await this.usersRepository.update(id, {
+      refreshToken,
     });
   }
 }

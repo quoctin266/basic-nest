@@ -31,7 +31,9 @@ export class User {
   @Column()
   age: number;
 
-  @Column()
+  @Column({
+    length: 500,
+  })
   refreshToken: string;
 
   @CreateDateColumn({ select: false })
@@ -69,6 +71,12 @@ export class User {
 
   @ManyToOne(() => Role, { eager: true })
   role: Role;
+
+  // @BeforeInsert()
+  // async hashPassword() {
+  //   const salt = await genSalt(10);
+  //   this.password = await hash(this.password, salt);
+  // }
 
   // @OneToMany(() => Company, (company) => company.createdBy)
   // companies: Company[];

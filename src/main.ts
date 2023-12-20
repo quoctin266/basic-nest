@@ -6,12 +6,14 @@ import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
 
+  app.use(cookieParser());
   // set global for jwt guard
   app.useGlobalGuards(new JwtAuthGuard(reflector));
   // set global for interceptor

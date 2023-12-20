@@ -4,7 +4,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Repository } from 'typeorm';
 import { Company } from './entities/company.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IUser } from 'src/users/users.interface';
+import { UserDTO } from 'src/users/users.dto';
 import { UsersService } from 'src/users/user.service';
 import { CompanyFilterDto } from './dto/company-filter.dto';
 
@@ -17,7 +17,7 @@ export class CompaniesService {
     private usersService: UsersService,
   ) {}
 
-  async create(createCompanyDto: CreateCompanyDto, user: IUser) {
+  async create(createCompanyDto: CreateCompanyDto, user: UserDTO) {
     const creator = await this.usersService.findOne(user.id);
 
     const result = await this.companiesRepository.insert({
@@ -73,7 +73,7 @@ export class CompaniesService {
     return this.companiesRepository.findOneBy({ id });
   }
 
-  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
+  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: UserDTO) {
     const updater = await this.usersService.findOne(user.id);
     return this.companiesRepository.update(id, {
       ...updateCompanyDto,
@@ -81,7 +81,7 @@ export class CompaniesService {
     });
   }
 
-  async remove(id: string, user: IUser) {
+  async remove(id: string, user: UserDTO) {
     const deleter = await this.usersService.findOne(user.id);
     await this.companiesRepository.update(id, {
       deletedBy: deleter,

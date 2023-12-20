@@ -10,6 +10,7 @@ import { Role } from './role/entities/role.entity';
 
 config();
 
+// for connecting to database
 export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   useFactory: (configService: ConfigService) => ({
     type: 'mysql',
@@ -25,6 +26,7 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   inject: [ConfigService],
 };
 
+// for migrating and seeding
 const dbConfig: DataSourceOptions & SeederOptions = {
   type: 'mysql' as const,
   host: process.env.DB_HOST,

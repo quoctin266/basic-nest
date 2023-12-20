@@ -1,9 +1,17 @@
-import { Controller, Get, Post, UseGuards, Req, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Body,
+  Res,
+  Get,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage, UserDec } from 'src/decorator/customize';
 import { LocalAuthGuard } from './local-auth.guard';
-import { Request } from 'express';
-import { IUser } from 'src/users/users.interface';
+import { Response, Request } from 'express';
+import { UserDTO } from 'src/users/users.dto';
 import { UsersService } from 'src/users/user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
@@ -29,8 +37,11 @@ export class AuthController {
     type: SuccessResponse,
   })
   @UseGuards(LocalAuthGuard)
-  login(@UserDec() user: IUser) {
-    return this.authService.login(user);
+  login(
+    @UserDec() user: UserDTO,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.login(user, response);
   }
 
   @Public()
@@ -40,9 +51,31 @@ export class AuthController {
     return this.usersService.registerUser(registerUserDTO);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Req() req: Request) {
-    return req.user;
+  @Get('account')
+  @ResponseMessage('Fetch current user info')
+  getAccount(@UserDec() user: UserDTO) {
+    return user;
+  }
+
+  @Public()
+  @Get('refresh')
+  @ResponseMessage('Get new token')
+  refreshToken(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.processNewToken(
+      request.cookies['refresh_token'],
+      response,
+    );
+  }
+
+  @Post('logout')
+  @ResponseMessage('Logout successfully')
+  logout(
+    @Res({ passthrough: true }) response: Response,
+    @UserDec() user: UserDTO,
+  ) {
+    return this.authService.clearToken(response, user);
   }
 }
