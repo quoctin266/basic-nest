@@ -1,16 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
-export class CompanyFilterDto {
-  @IsOptional()
-  name?: string;
-
-  @IsOptional()
-  address?: string;
-
-  @IsOptional()
-  description?: string;
-
+export class JobFilterDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()

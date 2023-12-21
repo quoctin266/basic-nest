@@ -24,7 +24,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.enableCors();
+  // origin true: same domain connection
+  app.enableCors({ origin: true, credentials: true });
 
   // config api version
   app.enableVersioning({

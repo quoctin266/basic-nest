@@ -37,9 +37,9 @@ export class UsersService {
     return await compare(password, hash);
   }
 
-  async findAll(page: number, limit: number) {
-    const defaultLimit = limit ? limit : 10;
-    const offset = (page - 1) * defaultLimit;
+  async findAll(current: number, pageSize: number) {
+    const defaultLimit = pageSize ? pageSize : 10;
+    const offset = (current ? current : 1 - 1) * defaultLimit;
 
     const query = this.usersRepository.createQueryBuilder('user');
 
@@ -56,7 +56,7 @@ export class UsersService {
 
     return {
       meta: {
-        current: page ? page : 1,
+        current: current ? current : 1,
         pageSize: defaultLimit,
         pages: totalPages,
         total: totalItems,

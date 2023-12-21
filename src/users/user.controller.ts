@@ -26,9 +26,10 @@ export class UserController {
   @Get()
   @ResponseMessage('Fetch list user successfully')
   getAllUsers(@Query() query: UserFilterDto) {
-    const { page, limit } = /*<{ page: number; limit: number }>*/ query;
+    const { current, pageSize } =
+      /*<{ current: number; pageSize: number }>*/ query;
 
-    return this.userService.findAll(page, limit);
+    return this.userService.findAll(current, pageSize);
   }
 
   @Get(':id')

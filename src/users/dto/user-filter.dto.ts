@@ -5,10 +5,10 @@ export class UserFilterDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  page?: number;
+  current?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  limit?: number;
+  pageSize?: number;
 }

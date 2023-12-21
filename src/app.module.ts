@@ -10,17 +10,19 @@ import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
 import { RolesModule } from './role/role.module';
 import { typeOrmAsyncConfig } from './config.service';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     UsersModule,
     AuthModule,
     CompaniesModule,
     RolesModule,
+    JobsModule,
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
   ],
   controllers: [AppController],
   providers: [

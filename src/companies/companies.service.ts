@@ -29,8 +29,8 @@ export class CompaniesService {
   }
 
   async findAll(queryObj: CompanyFilterDto) {
-    const defaultLimit = queryObj.limit ? queryObj.limit : 10;
-    const offset = (queryObj.page - 1) * defaultLimit;
+    const defaultLimit = queryObj.pageSize ? queryObj.pageSize : 10;
+    const offset = (queryObj.current ? queryObj.current : 1 - 1) * defaultLimit;
 
     const query = this.companiesRepository.createQueryBuilder('company');
 
@@ -60,7 +60,7 @@ export class CompaniesService {
 
     return {
       meta: {
-        current: queryObj.page ? queryObj.page : 1,
+        current: queryObj.current ? queryObj.current : 1,
         pageSize: defaultLimit,
         pages: totalPages,
         total: totalItems,

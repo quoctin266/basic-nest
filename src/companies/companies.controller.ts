@@ -33,7 +33,7 @@ export class CompaniesController {
   // set response message as meta data
   @ResponseMessage('Fetching company list success')
   findAll(@Query() query: CompanyFilterDto) {
-    // const { page, limit, ...filter } = <{ page: number; limit: number }>query;
+    // const { current, pageSize, ...filter } = <{ current: number; pageSize: number }>query;
     return this.companiesService.findAll(query);
   }
 

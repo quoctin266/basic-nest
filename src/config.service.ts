@@ -7,6 +7,7 @@ import { SeederOptions } from 'typeorm-extension';
 import { Company } from 'src/companies/entities/company.entity';
 import { User } from './users/user.entity';
 import { Role } from './role/entities/role.entity';
+import { Job } from './jobs/entities/job.entity';
 
 config();
 
@@ -33,7 +34,7 @@ const dbConfig: DataSourceOptions & SeederOptions = {
   port: +process.env.DB_POST,
   username: process.env.DB_USER,
   database: process.env.DB_NAME,
-  entities: [Company, User, Role],
+  entities: [Company, User, Role, Job],
   synchronize: true,
   migrationsRun: true,
   migrations: ['src/migration/*.ts'],
