@@ -24,6 +24,9 @@ export class Company {
   @Column()
   description: string;
 
+  @Column()
+  logo: string;
+
   @CreateDateColumn({ select: false })
   createdAt: Date;
 

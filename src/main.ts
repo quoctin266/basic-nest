@@ -7,9 +7,11 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
 
@@ -26,6 +28,9 @@ async function bootstrap() {
   );
   // origin true: same domain connection
   app.enableCors({ origin: true, credentials: true });
+
+  // config css, js, image location
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   // config api version
   app.enableVersioning({
@@ -49,5 +54,6 @@ async function bootstrap() {
   });
 
   await app.listen(configService.get<string>('PORT'));
+  console.log('>>> Database connected');
 }
 bootstrap();

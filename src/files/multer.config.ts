@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { UnprocessableEntityException, Injectable } from '@nestjs/common';
 import {
   MulterModuleOptions,
   MulterOptionsFactory,
@@ -6,12 +6,16 @@ import {
 import fs from 'fs';
 import { diskStorage } from 'multer';
 import path, { join } from 'path';
+import { acceptTypes } from './config/files.format';
 
 @Injectable()
 export class MulterConfigService implements MulterOptionsFactory {
+  // get root directory of project
   getRootPath = () => {
     return process.cwd();
   };
+
+  // create directory if not exist
   ensureExists(targetDirectory: string) {
     fs.mkdir(targetDirectory, { recursive: true }, (error) => {
       if (!error) {
@@ -35,10 +39,12 @@ export class MulterConfigService implements MulterOptionsFactory {
       }
     });
   }
+
   createMulterOptions(): MulterModuleOptions {
     return {
       storage: diskStorage({
         destination: (req, file, cb) => {
+          // get folder name from request header
           const folder = req?.headers?.folder_type ?? 'default';
           this.ensureExists(`public/images/${folder}`);
           cb(null, join(this.getRootPath(), `public/images/${folder}`));
@@ -52,6 +58,20 @@ export class MulterConfigService implements MulterOptionsFactory {
           cb(null, finalName);
         },
       }),
+      limits: { fileSize: 1024 * 1024 * 5 },
+
+      // validate file mime type
+      fileFilter(req, file, cb) {
+        try {
+          if (!acceptTypes.includes(file.mimetype))
+            throw new UnprocessableEntityException(
+              'Invalid file type. Expected type: image/jpeg|image/png|text/plain',
+            );
+          cb(null, true);
+        } catch (error) {
+          cb(error, false);
+        }
+      },
     };
   }
 }

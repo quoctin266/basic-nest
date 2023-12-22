@@ -12,7 +12,7 @@ import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ResponseMessage, UserDec } from 'src/decorator/customize';
+import { Public, ResponseMessage, UserDec } from 'src/decorator/customize';
 import { UserDTO } from 'src/users/users.dto';
 import { JobFilterDto } from './dto/job-filter.dto';
 
@@ -28,6 +28,7 @@ export class JobsController {
   }
 
   @Get()
+  @Public()
   @ResponseMessage('Fetch job list successfully')
   findAll(@Query() query: JobFilterDto) {
     return this.jobsService.findAll(query);
