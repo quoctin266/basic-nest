@@ -12,6 +12,8 @@ import { RolesModule } from './role/role.module';
 import { typeOrmAsyncConfig } from './config.service';
 import { JobsModule } from './jobs/jobs.module';
 import { FilesModule } from './files/files.module';
+import { ResumesModule } from './resumes/resumes.module';
+import { StatusUpdatesModule } from './status-updates/status-updates.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { FilesModule } from './files/files.module';
     JobsModule,
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     FilesModule,
+    ResumesModule,
+    StatusUpdatesModule,
   ],
   controllers: [AppController],
   providers: [

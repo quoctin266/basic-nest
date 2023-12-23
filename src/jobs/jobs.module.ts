@@ -10,5 +10,6 @@ import { CompaniesModule } from 'src/companies/companies.module';
   imports: [TypeOrmModule.forFeature([Job]), UsersModule, CompaniesModule],
   controllers: [JobsController],
   providers: [JobsService],
+  exports: [JobsService],
 })
 export class JobsModule {}

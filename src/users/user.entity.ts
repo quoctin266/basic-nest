@@ -33,6 +33,7 @@ export class User {
 
   @Column({
     length: 500,
+    select: false,
   })
   refreshToken: string;
 

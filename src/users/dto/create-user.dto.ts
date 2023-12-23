@@ -1,4 +1,4 @@
-import { Allow, IsEmail, IsNotEmpty } from 'class-validator';
+import { Allow, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
@@ -24,6 +24,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   roleId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   companyId: string;
 }
