@@ -51,6 +51,8 @@ export class ResumesService {
       .leftJoinAndSelect('resume.user', 'user')
       .leftJoin('resume.job', 'job')
       .addSelect(['job.name'])
+      .leftJoin('job.company', 'company')
+      .addSelect(['company.name'])
       .leftJoinAndSelect('resume.history', 'statusUpdate')
       .leftJoinAndSelect('statusUpdate.updatedBy', 'userAlias')
       .offset(offset ? offset : 0)
