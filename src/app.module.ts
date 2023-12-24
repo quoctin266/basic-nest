@@ -15,6 +15,7 @@ import { FilesModule } from './files/files.module';
 import { ResumesModule } from './resumes/resumes.module';
 import { StatusUpdatesModule } from './status-updates/status-updates.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { DatabasesModule } from './databases/databases.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PermissionsModule } from './permissions/permissions.module';
     ResumesModule,
     StatusUpdatesModule,
     PermissionsModule,
+    DatabasesModule,
   ],
   controllers: [AppController],
   providers: [

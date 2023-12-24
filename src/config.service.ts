@@ -23,11 +23,13 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
     synchronize: true,
     migrationsRun: true,
     migrations: [join(__dirname, 'migration', '*.{ts,js}')],
+    factories: ['src/factories/*.ts'],
+    seeds: ['src/seeder/*.ts'],
   }),
   inject: [ConfigService],
 };
 
-// for migrating and seeding
+// for manually migrating and seeding
 const dbConfig: DataSourceOptions & SeederOptions = {
   type: 'mysql' as const,
   host: process.env.DB_HOST,
