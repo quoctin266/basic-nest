@@ -1,35 +1,36 @@
-import { Permission } from 'src/permissions/entities/permission.entity';
+import { Role } from 'src/role/entities/role.entity';
 import { User } from 'src/users/user.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  DeleteDateColumn,
+  Entity,
   JoinColumn,
   ManyToMany,
-  JoinTable,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-export class Role {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Permission {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
 
   @Column()
-  description: string;
+  apiPath: string;
 
   @Column()
-  isActive: boolean;
+  method: string;
 
-  @ManyToMany(() => Permission, (permission) => permission.roles)
-  @JoinTable()
-  permissions: Permission[];
+  @Column()
+  module: string;
+
+  @ManyToMany(() => Role, (role) => role.permissions)
+  roles: Role[];
 
   @CreateDateColumn({ select: false })
   createdAt: Date;

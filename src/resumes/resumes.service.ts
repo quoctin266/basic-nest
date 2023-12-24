@@ -112,6 +112,8 @@ export class ResumesService {
     return query
       .leftJoin('resume.job', 'job')
       .addSelect(['job.name'])
+      .leftJoin('job.company', 'company')
+      .addSelect(['company.name'])
       .where('resume.userId = :userId', { userId: user.id })
       .getMany();
   }
