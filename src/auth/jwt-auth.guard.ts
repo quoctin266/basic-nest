@@ -37,7 +37,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     // check user permission
     const targetMethod = request.method;
-    const targetPath = request.route.path;
+    const targetPath: string = request.route.path;
+    let allowAll = false;
 
     const userPermissions: Permission[] = user.permissions ?? [];
     const isExist = userPermissions.find((permission) => {
@@ -46,7 +47,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       );
     });
 
-    if (!isExist && user.role !== 'ADMIN')
+    // let all role use auth API
+    if (targetPath.startsWith('/api/v1/auth')) allowAll = true;
+
+    if (!isExist && user.role !== 'ADMIN' && !allowAll)
       throw new ForbiddenException('Access not allow');
 
     // request.user

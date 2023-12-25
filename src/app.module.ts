@@ -16,6 +16,7 @@ import { ResumesModule } from './resumes/resumes.module';
 import { StatusUpdatesModule } from './status-updates/status-updates.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { DatabasesModule } from './databases/databases.module';
+import { SubscribersModule } from './subscribers/subscribers.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DatabasesModule } from './databases/databases.module';
     StatusUpdatesModule,
     PermissionsModule,
     DatabasesModule,
+    SubscribersModule,
   ],
   controllers: [AppController],
   providers: [
