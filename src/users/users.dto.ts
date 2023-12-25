@@ -1,3 +1,5 @@
+import { Permission } from 'src/permissions/entities/permission.entity';
+
 export class UserDTO {
   /**
    * @example 'string'
@@ -18,4 +20,6 @@ export class UserDTO {
    * @example 'string'
    */
   role: string;
+
+  permissions?: Permission[];
 }

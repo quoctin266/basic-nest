@@ -138,7 +138,7 @@ export class UsersService {
 
   async remove(id: number, deleterInfo: UserDTO) {
     const user = await this.findOne(id);
-    if (user.role.name === 'ADMIN')
+    if (user?.role.name === 'ADMIN')
       throw new BadRequestException('Cannot delete admin account');
     const deleter = await this.findOne(deleterInfo.id);
     await this.usersRepository.update(id, {

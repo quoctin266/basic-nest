@@ -1,11 +1,14 @@
 import {
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from 'src/decorator/customize';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
+import { Permission } from 'src/permissions/entities/permission.entity';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -24,11 +27,29 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err, user, info) {
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+    const request: Request = context.switchToHttp().getRequest();
+
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       throw err || new UnauthorizedException('Invalid Token');
     }
+
+    // check user permission
+    const targetMethod = request.method;
+    const targetPath = request.route.path;
+
+    const userPermissions: Permission[] = user.permissions ?? [];
+    const isExist = userPermissions.find((permission) => {
+      return (
+        permission.apiPath === targetPath && permission.method === targetMethod
+      );
+    });
+
+    if (!isExist && user.role !== 'ADMIN')
+      throw new ForbiddenException('Access not allow');
+
+    // request.user
     return user;
   }
 }

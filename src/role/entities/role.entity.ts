@@ -27,7 +27,9 @@ export class Role {
   @Column()
   isActive: boolean;
 
-  @ManyToMany(() => Permission, (permission) => permission.roles)
+  @ManyToMany(() => Permission, (permission) => permission.roles, {
+    eager: true,
+  })
   @JoinTable()
   permissions: Permission[];
 
