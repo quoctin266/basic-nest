@@ -55,21 +55,21 @@ export class Job {
   @ManyToOne(() => Company)
   company: Company;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({
     name: 'updatedBy',
     referencedColumnName: 'id',
   })
   updatedBy: User;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({
     name: 'createdBy',
     referencedColumnName: 'id',
   })
   createdBy: User;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({
     name: 'deletedBy',
     referencedColumnName: 'id',

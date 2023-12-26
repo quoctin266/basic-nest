@@ -17,6 +17,7 @@ import { StatusUpdatesModule } from './status-updates/status-updates.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { DatabasesModule } from './databases/databases.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SubscribersModule } from './subscribers/subscribers.module';
     PermissionsModule,
     DatabasesModule,
     SubscribersModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
