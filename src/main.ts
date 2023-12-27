@@ -9,6 +9,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,21 +17,28 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
 
   app.use(cookieParser());
+
   // set global for jwt guard
   app.useGlobalGuards(new JwtAuthGuard(reflector));
+
   // set global for interceptor
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
   );
+
   // origin true: same domain connection
   app.enableCors({ origin: true, credentials: true });
 
   // config css, js, image location
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  // config helmet
+  app.use(helmet());
 
   // config api version
   app.enableVersioning({
@@ -39,6 +47,7 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
 
+  // config swagger
   const config = new DocumentBuilder()
     .setTitle('Nest Basic API')
     .setDescription('API For Nest Basic')

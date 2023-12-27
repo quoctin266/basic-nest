@@ -15,6 +15,7 @@ export class MailService {
   async getMatchingJob() {
     const subscribers = await this.subscribersRepository.find();
     const result = await Promise.all(
+      // find matching job for each subscriber
       subscribers.map(async (subscriber) => {
         const subSkills = subscriber.skills;
         const jobs = await this.jobsRepository

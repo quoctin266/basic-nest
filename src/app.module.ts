@@ -18,18 +18,28 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { DatabasesModule } from './databases/databases.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { MailModule } from './mail/mail.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 60 seconds
+        limit: 10,
+      },
+    ]),
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     UsersModule,
     AuthModule,
     CompaniesModule,
     RolesModule,
     JobsModule,
-    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     FilesModule,
     ResumesModule,
     StatusUpdatesModule,
@@ -41,10 +51,10 @@ import { MailModule } from './mail/mail.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

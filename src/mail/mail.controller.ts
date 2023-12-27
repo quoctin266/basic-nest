@@ -3,6 +3,7 @@ import { MailService } from './mail.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Public, ResponseMessage } from 'src/decorator/customize';
 import { ApiTags } from '@nestjs/swagger';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @ApiTags('mail')
 @Controller('mail')
@@ -15,6 +16,7 @@ export class MailController {
   @Get()
   @ResponseMessage('Send mail successfully')
   @Public()
+  @Cron('0 0 0 * * 0') // 0:00 am every sunday
   async sendMail() {
     const result = await this.mailService.getMatchingJob();
     const response = await Promise.all(
