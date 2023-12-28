@@ -21,6 +21,8 @@ import { MailModule } from './mail/mail.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { HealthModule } from './health/health.module';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { APP_GUARD } from '@nestjs/core';
     DatabasesModule,
     SubscribersModule,
     MailModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [
